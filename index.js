@@ -10,6 +10,7 @@ exports.handler = async event => {
   try {
     const body = JSON.parse(event.body)
     const markerid = body.markerid || uuidv4()
+    const fileType = body.fileType
     const latlng = body.latlng
     const claims = requestContext.authorizer.jwt.claims
     const email = claims.email
@@ -20,14 +21,18 @@ exports.handler = async event => {
       picture: u.picture,
     }))(claims)
 
-    if (!latlng || !creator || !email) {
+    if (fileType !== 'image/jpeg' || fileType !== 'image/png' || fileType !== 'image/webp') {
+      throw new Error("invalid request")
+    }
+
+    if (!latlng || !creator || !email ) {
       throw new Error("invalid request")
     }
     let params = {
       Bucket: BUCKET_NAME,
       Fields: {
         key: email,
-        'Content-Type': 'image/jpeg',
+        'Content-Type': fileType,
         'Cache-Control': 'public',
         'x-amz-meta-markerid': markerid,
         'x-amz-meta-latlng': JSON.stringify(latlng),
@@ -36,7 +41,7 @@ exports.handler = async event => {
       Expires: 300,
       Conditions: [
         ["content-length-range", 0, 20971520],
-        { 'Content-Type': 'image/jpeg' }
+        { 'Content-Type': fileType }
       ]
     };
 
