@@ -21,11 +21,11 @@ exports.handler = async event => {
       picture: u.picture,
     }))(claims)
 
-    if (fileType !== 'image/jpeg' || fileType !== 'image/png' || fileType !== 'image/webp') {
+    if (!(fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/webp')) {
       throw new Error("invalid request")
     }
 
-    if (!latlng || !creator || !email ) {
+    if (!latlng || !creator.name || !email ) {
       throw new Error("invalid request")
     }
     let params = {
@@ -55,6 +55,7 @@ exports.handler = async event => {
   catch (error) {
     return {
       statusCode: 400,
+      event
     }
 
   }
