@@ -12,6 +12,7 @@ exports.handler = async event => {
     const markerid = body.markerid || uuidv4()
     const fileType = body.fileType
     const latlng = body.latlng
+    const type = body.type
     const claims = requestContext.authorizer.jwt.claims
     const email = claims.email
     const creator = (u => ({
@@ -25,7 +26,7 @@ exports.handler = async event => {
       throw new Error("invalid request")
     }
 
-    if (!latlng || !creator.name || !email ) {
+    if (!latlng || !creator.name || !email || !type ) {
       throw new Error("invalid request")
     }
     let params = {
@@ -35,6 +36,7 @@ exports.handler = async event => {
         'Content-Type': fileType,
         'Cache-Control': 'public',
         'x-amz-meta-markerid': markerid,
+        'x-amz-meta-type': type,
         'x-amz-meta-latlng': JSON.stringify(latlng),
         'x-amz-meta-creator': JSON.stringify(creator)
       },
