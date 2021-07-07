@@ -57,7 +57,6 @@ exports.handler = async event => {
   catch (error) {
     return {
       statusCode: 400,
-      event
     }
 
   }
