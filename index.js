@@ -41,14 +41,21 @@ exports.handler = async (event) => {
       "x-amz-meta-creator": JSON.stringify(creator),
     };
 
-    if (type === "marker" || type === "mem") {
-      const markerid = body.markerid || uuidv4();
+    if (type === "marker") {
+      const markerid = uuidv4();
       const latlng = body.latlng;
       fields["x-amz-meta-markerid"] = markerid;
-      fields["x-amz-meta-latlng"] = JSON.stringify(latlng);
+    } else if (type === "mem") {
+      const memid = uuidv4();
+      const memageid = body.memageid;
+      if (!memageid) {
+        throw new Error("invalid request");
+      }
+      fields["x-amz-meta-memid"] = memid;
+      fields["x-amz-meta-memageid"] = memageid;
     } else if (type === "memage") {
-      const memageid = body.memageid || uuidv4();
-      fields["x-amz-meta-memage"] = memageid;
+      const memageid = uuidv4();
+      fields["x-amz-meta-memageid"] = memageid;
     } else {
       throw new Error("invalid request");
     }
