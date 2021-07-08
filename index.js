@@ -43,7 +43,6 @@ exports.handler = async (event) => {
 
     if (type === "marker") {
       const markerid = uuidv4();
-      const latlng = body.latlng;
       fields["x-amz-meta-markerid"] = markerid;
     } else if (type === "mem") {
       const memid = uuidv4();
