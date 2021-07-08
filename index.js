@@ -27,13 +27,16 @@ exports.handler = async (event) => {
       throw new Error("invalid request");
     }
 
+    const imageId = uuidv4()
+
     const fields = {
       key: email,
       "Content-Type": fileType,
       "Cache-Control": "public",
       "x-amz-meta-type": type,
       "x-amz-meta-email": email,
-      "x-amz-meta-imageId": uuidv4(),
+      "x-amz-meta-imageId": imageId,
+      "x-amz-meta-imageKey": `${imageId}.webp`, 
     };
 
     let params = {
