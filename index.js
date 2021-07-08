@@ -9,17 +9,14 @@ exports.handler = async (event) => {
   const requestContext = event.requestContext;
   try {
     const body = JSON.parse(event.body);
-    const type = body.type;
     const fileType = body.fileType;
     const claims = requestContext.authorizer.jwt.claims;
     const email = claims.email;
-    const creator = ((u) => ({
-      name: u.name,
-      family_name: u.family_name,
-      given_name: u.given_name,
-      picture: u.picture,
-    }))(claims);
-
+    
+    if (!email) {
+      throw new Error("invalid request");
+    }
+    
     if (
       !(
         fileType === "image/jpeg" ||
@@ -30,34 +27,14 @@ exports.handler = async (event) => {
       throw new Error("invalid request");
     }
 
-    if (!creator.name || !email || !type) {
-      throw new Error("invalid request");
-    }
     const fields = {
       key: email,
       "Content-Type": fileType,
       "Cache-Control": "public",
       "x-amz-meta-type": type,
-      "x-amz-meta-creator": JSON.stringify(creator),
+      "x-amz-meta-email": email,
+      "x-amz-meta-imageId": uuidv4(),
     };
-
-    if (type === "marker") {
-      const markerid = uuidv4();
-      fields["x-amz-meta-markerid"] = markerid;
-    } else if (type === "mem") {
-      const memid = uuidv4();
-      const memageid = body.memageid;
-      if (!memageid) {
-        throw new Error("invalid request");
-      }
-      fields["x-amz-meta-memid"] = memid;
-      fields["x-amz-meta-memageid"] = memageid;
-    } else if (type === "memage") {
-      const memageid = uuidv4();
-      fields["x-amz-meta-memageid"] = memageid;
-    } else {
-      throw new Error("invalid request");
-    }
 
     let params = {
       Bucket: BUCKET_NAME,
