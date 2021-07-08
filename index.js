@@ -29,13 +29,14 @@ exports.handler = async (event) => {
 
     const imageId = uuidv4()
 
+    // metadata keys dont respect capitalization
     const fields = {
       key: email,
       "Content-Type": fileType,
       "Cache-Control": "public",
       "x-amz-meta-email": email,
-      "x-amz-meta-imageId": imageId,
-      "x-amz-meta-imageKey": `${imageId}.webp`, 
+      "x-amz-meta-imageid": imageId,
+      "x-amz-meta-imagekey": `${imageId}.webp`, 
     };
 
     let params = {
